@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <circle cx="32" cy="32" r="30" fill="#0f172a"/>
+  <g transform="translate(32,34) scale(0.28)" fill="#e2e8f0">
+    <!-- Ears -->
+    <polygon points="-85,-140 -65,-60 -40,-90"/>
+    <polygon points="85,-140 65,-60 40,-90"/>
+    <!-- Head -->
+    <ellipse cx="0" cy="-40" rx="62" ry="55"/>
+    <!-- Snout -->
+    <ellipse cx="0" cy="10" rx="35" ry="28" fill="#cbd5e1"/>
+    <!-- Nose -->
+    <ellipse cx="0" cy="2" rx="12" ry="8" fill="#0f172a"/>
+    <!-- Eyes -->
+    <ellipse cx="-25" cy="-45" rx="10" ry="9" fill="#0f172a"/>
+    <ellipse cx="-23" cy="-46" rx="6" ry="7" fill="#38bdf8"/>
+    <ellipse cx="25" cy="-45" rx="10" ry="9" fill="#0f172a"/>
+    <ellipse cx="23" cy="-46" rx="6" ry="7" fill="#38bdf8"/>
+    <!-- Neck -->
+    <path d="M-50,30 Q-60,70 -45,90 Q-20,80 0,85 Q20,80 45,90 Q60,70 50,30 Q30,50 0,55 Q-30,50 -50,30Z"/>
+  </g>
+  <!-- Packet dots -->
+  <circle cx="12" cy="14" r="2" fill="#3b82f6" opacity="0.8"/>
+  <circle cx="52" cy="14" r="2" fill="#3b82f6" opacity="0.8"/>
+  <circle cx="10" cy="50" r="1.5" fill="#0ea5e9" opacity="0.7"/>
+  <circle cx="54" cy="50" r="1.5" fill="#0ea5e9" opacity="0.7"/>
+</svg>

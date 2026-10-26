@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PacketWolf by Zyvor: know which process made the call</title>
+<meta name="description" content="Kernel-native network intelligence for Kubernetes. Process-to-socket attribution, AutoPolicy for Cilium, cross-layer root cause and autonomous healing. Binary release on GitHub Container Registry.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="PacketWolf: know which process made the call">
+<meta property="og:description" content="Kernel-native network intelligence for Kubernetes: attribution, AutoPolicy, root cause, healing.">
+<meta property="og:image" content="https://zyvorai.github.io/zyvor-packetwolf-site/assets/hero-dark.jpg">
+<meta property="og:url" content="https://zyvorai.github.io/zyvor-packetwolf-site/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<style>
+  :root { color-scheme: dark light;
+    --bg:#000; --panel:#111113; --panel2:#1c1c1e; --line:rgba(255,255,255,.12); --text:#f5f5f7; --mute:#a1a1a6; --faint:#6e6e73;
+    --amber:#ffb340; --amber2:#ff9f0a; --blue:#0071e3; --link:#2997ff;
+    --sans:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',Helvetica,Arial,sans-serif; --mono:'SF Mono',ui-monospace,Menlo,Consolas,monospace; }
+  @media (prefers-color-scheme: light) { :root {
+    --bg:#fff; --panel:#f5f5f7; --panel2:#fff; --line:rgba(0,0,0,.12); --text:#1d1d1f; --mute:#6e6e73; --faint:#86868b; --link:#0066cc; } }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; background:var(--bg); color:var(--text); font:17px/1.5 var(--sans); -webkit-font-smoothing:antialiased; }
+  a { color:var(--link); text-decoration:none; } a:hover { text-decoration:underline; }
+  .wrap { max-width:1080px; margin:0 auto; padding:0 24px; }
+  nav { position:sticky; top:0; z-index:10; background:color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter:saturate(180%) blur(18px); border-bottom:1px solid var(--line); }
+  nav .wrap { display:flex; align-items:center; gap:26px; height:52px; }
+  nav b { font-weight:700; letter-spacing:-.01em; display:flex; align-items:center; gap:9px; color:var(--text); }
+  nav b i { width:22px; height:22px; border-radius:6px; background:linear-gradient(135deg,#ff9f0a,#ff5e3a); display:inline-grid; place-items:center; font-style:normal; font-size:13px; color:#fff; }
+  nav a.l { color:var(--mute); font-size:14px; } nav a.l:hover { color:var(--text); text-decoration:none; }
+  nav .sp { flex:1; }
+  .btn { display:inline-block; font-weight:600; font-size:15px; padding:10px 18px; border-radius:980px; background:var(--blue); color:#fff; border:1px solid var(--blue); }
+  .btn:hover { text-decoration:none; filter:brightness(1.1); }
+  .btn.ghost { background:transparent; color:var(--text); border-color:var(--line); }
+  .hero { padding:56px 0 24px; text-align:center; }
+  .hero img { width:100%; height:auto; max-width:1080px; border-radius:22px; border:1px solid var(--line); display:block; margin:0 auto; }
+  h1 { font-size:clamp(34px,5.2vw,56px); line-height:1.05; letter-spacing:-.035em; margin:34px 0 14px; }
+  h1 em { font-style:normal; color:var(--amber); }
+  .lede { max-width:720px; margin:0 auto 26px; color:var(--mute); font-size:20px; }
+  .cta { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  section { padding:64px 0 8px; }
+  .eyebrow { font:600 12px/1 var(--mono); letter-spacing:.16em; text-transform:uppercase; color:var(--amber); margin:0 0 12px; }
+  h2 { font-size:clamp(26px,3.4vw,38px); letter-spacing:-.03em; line-height:1.1; margin:0 0 12px; }
+  .sub { color:var(--mute); max-width:680px; margin:0 0 28px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:20px; }
+  .card h3 { margin:0 0 6px; font-size:19px; letter-spacing:-.015em; }
+  .card p { margin:0; color:var(--mute); font-size:15px; }
+  .tag { display:inline-block; font:700 11px/1 var(--mono); letter-spacing:.1em; text-transform:uppercase; color:#000; background:var(--amber); padding:5px 8px; border-radius:6px; margin-bottom:10px; }
+  .steps { counter-reset:s; display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; }
+  .steps .card { position:relative; padding-top:44px; }
+  .steps .card::before { counter-increment:s; content:counter(s); position:absolute; left:20px; top:14px; width:24px; height:24px; border-radius:50%; background:var(--amber2); color:#000; font-weight:800; font-size:13px; display:grid; place-items:center; }
+  pre { margin:0; background:#0d0d0f; color:#f5f5f7; border-radius:14px; padding:18px 20px; overflow:auto; font:14px/1.6 var(--mono); border:1px solid rgba(255,255,255,.1); }
+  pre .c { color:#8e8e93; }
+  .two { display:grid; grid-template-columns:1.1fr .9fr; gap:22px; align-items:start; }
+  @media (max-width:820px) { .two { grid-template-columns:1fr; } nav a.l { display:none; } }
+  table { width:100%; border-collapse:collapse; font-size:15px; }
+  th,td { text-align:left; padding:12px 14px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--faint); font:600 12px/1 var(--mono); letter-spacing:.1em; text-transform:uppercase; }
+  td:first-child { font-weight:600; white-space:nowrap; }
+  .note { margin-top:14px; color:var(--faint); font-size:14px; }
+  footer { margin-top:72px; padding:30px 0 46px; border-top:1px solid var(--line); color:var(--faint); font-size:14px; }
+  footer .wrap { display:flex; flex-wrap:wrap; gap:8px 26px; justify-content:space-between; }
+  .banner { margin:0 0 0; padding:12px 16px; border:1px solid var(--line); border-radius:12px; color:var(--mute); font-size:14px; background:var(--panel); }
+</style>
+</head>
+<body>
+<nav><div class="wrap">
+  <b><i>P</i>PacketWolf</b>
+  <a class="l" href="#how">How it works</a><a class="l" href="#new">New</a><a class="l" href="#run">Run it</a><a class="l" href="#plans">Plans</a>
+  <span class="sp"></span>
+  <a class="btn" href="https://zyvor.dev/schedule?utm_source=pages&utm_medium=packetwolf&utm_campaign=nav">Book a demo</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <img src="assets/hero-dark.jpg" alt="PacketWolf: know which process made the call. Fix it before it pages you." width="2400" height="1260">
+  <h1>Know which process made the call.<br><em>Fix it before it pages you.</em></h1>
+  <p class="lede">Kernel-native network intelligence for Kubernetes. PacketWolf ties every connection to the process behind it, learns your traffic into Cilium policy, explains an incident across layers and heals what it can.</p>
+  <div class="cta"><a class="btn" href="#run">Run the image</a><a class="btn ghost" href="https://github.com/zyvorai/zyvor-packetwolf-site#readme">Read the README</a></div>
+</div></header>
+
+<main class="wrap">
+  <div class="banner">This site and its GitHub repository publish <b>binaries and documentation only</b>. There is no product source code here.</div>
+
+  <section id="how">
+    <p class="eyebrow">How it works</p>
+    <h2>From a slow request to a fixed one.</h2>
+    <p class="sub">Five steps, one console. Each is a capability in the product, not a roadmap item.</p>
+    <div class="steps">
+      <div class="card"><h3>See every flow</h3><p>Hubble flows, verdicts, drops and L7 context on a live service map.</p></div>
+      <div class="card"><h3>Name the process</h3><p>Kernel attribution: which process made which call, not just which pod.</p></div>
+      <div class="card"><h3>Write the policy</h3><p>AutoPolicy learns real traffic and suggests Cilium rules.</p></div>
+      <div class="card"><h3>One root cause</h3><p><code>netpred explain</code> joins kernel, DNS, network and Kubernetes evidence.</p></div>
+      <div class="card"><h3>Fix, then prove it</h3><p>An autonomous healer, checked with chaos and replay.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">What you get</p>
+    <h2>A console, a CLI and an API.</h2>
+    <div class="grid" style="margin-top:22px">
+      <div class="card"><h3>87 pages</h3><p>Observability, security, intelligence, operations, networking, eBPF data and system, plus 60 embeddable panels.</p></div>
+      <div class="card"><h3>15 intelligence engines</h3><p>Anomaly detection, AutoPolicy, healer, root cause, forecasting and more.</p></div>
+      <div class="card"><h3>Non-Kubernetes containers</h3><p>A node agent surfaces Podman and Docker containers that cluster tools never see.</p></div>
+      <div class="card"><h3>Roles and SSO</h3><p>Users and roles, with OIDC, SAML and LDAP sign-in.</p></div>
+    </div>
+    <p class="note">Every page is listed in the <a href="https://github.com/zyvorai/zyvor-packetwolf-site/blob/main/docs/pages.md">page index</a>.</p>
+  </section>
+
+  <section id="new">
+    <p class="eyebrow">New in this release</p>
+    <h2>Three additions.</h2>
+    <div class="grid" style="margin-top:22px">
+      <div class="card"><span class="tag">Operations</span><h3>BPF Attachments</h3><p>Which eBPF programs PacketWolf expects, whether each is really attached, and drift. A silent loss of a hook after a NIC or kernel change becomes visible.</p></div>
+      <div class="card"><span class="tag">Observability</span><h3>Network changes</h3><p>Which link, address, route or neighbour changed on a node, and when, with findings such as default route removed and uplink down. Linux only.</p></div>
+      <div class="card"><span class="tag">Agents</span><h3>MCP server</h3><p>16 read-only tools for Claude Code, Claude Desktop and other MCP clients. Off by default, same credentials as the API, stricter about who may call it.</p></div>
+    </div>
+  </section>
+
+  <section id="run">
+    <p class="eyebrow">Run it</p>
+    <h2>One container, one minute.</h2>
+    <div class="two">
+      <div>
+<pre><span class="c"># evaluation on one machine</span>
+docker run -d --name packetwolf -p 9191:9191 \
+  -e JWT_SECRET="$(openssl rand -hex 32)" \
+  -e PACKETWOLF_ADMIN_API_KEY="$(openssl rand -hex 24)" \
+  -e PACKETWOLF_ADMIN_PASSWORD='choose-a-strong-password' \
+  ghcr.io/zyvorai/zyvor-packetwolf:latest
+
+<span class="c"># then open</span>
+http://localhost:9191</pre>
+      </div>
+      <div>
+        <p style="margin-top:0">The image runs the API and the web console on port 9191. Nothing ships with a default password or key: the three secrets above are required. Give it about 20 seconds to start, then sign in as <code>admin</code>.</p>
+        <p>Without a Kubernetes cluster and Cilium behind it, pages that depend on cluster data show their empty states. For the full experience, <a href="https://zyvor.dev/poc?utm_source=pages&utm_medium=packetwolf&utm_campaign=run">start a 30-day PoC</a>; deployment packages come with it.</p>
+        <p class="note" style="margin:0">Linux x86_64 image. An arm64 image is not published yet.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="plans">
+    <p class="eyebrow">Plans and licence</p>
+    <h2>Proprietary, distributed as binaries.</h2>
+    <table style="margin-top:18px">
+      <tr><th>Plan</th><th>What you get</th></tr>
+      <tr><td>Community</td><td>Evaluation and non-production use, where the licence allows it</td></tr>
+      <tr><td>Professional</td><td>Entry edition, updates and upgrades, business-hours support</td></tr>
+      <tr><td>Enterprise</td><td>Advanced edition, updates and upgrades, priority support</td></tr>
+      <tr><td>Premium</td><td>Contracted scope with 24x7 critical intake</td></tr>
+    </table>
+    <p class="note">Priced per managed core with an annual minimum. Quotes from <a href="mailto:sales@zyvor.dev">sales@zyvor.dev</a>. The <a href="https://github.com/zyvorai/zyvor-packetwolf-site/blob/main/LICENSE">licence text</a> applies to the binaries.</p>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <span>© 2026 ZyvorAI Labs Private Limited</span>
+  <span><a href="https://zyvor.dev">zyvor.dev</a> · <a href="mailto:info@zyvor.dev">info@zyvor.dev</a> · <a href="https://github.com/zyvorai/zyvor-netra">Netra</a></span>
+</div></footer>
+</body>
+</html>
