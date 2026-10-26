@@ -35,6 +35,7 @@ Every page in the PacketWolf console, grouped by area. Routes are the paths in t
 | Bandwidth | `/bandwidth` | Bandwidth usage by workload or interface. |
 | Interfaces | `/interfaces` | Host and node network interfaces. |
 | Network changes | `/netlink-changes` | Which link, address, route or neighbor changed on this node, and when — with findings such as default route removed or uplink down. |
+| Per-second metrics | `/metrics-seconds` | One-second resolution rates for flows, API requests, 5xx responses and node network counters over the last 15 minutes. Shows unavailable, never invented numbers, when a source cannot be read. |
 | Metrics | `/system-metrics` | System and PacketWolf metrics dashboard. |
 
 ## Security
@@ -94,6 +95,7 @@ Every page in the PacketWolf console, grouped by area. Routes are the paths in t
 | eBPF Hub | `/ebpf-hub` | eBPF hub landing page for map readers, probes, and dataplane status. |
 | eBPF Data Plane | `/ebpf-dataplane` | Honest eBPF dataplane status — which probe phases attached, failed, or remain userspace. |
 | BPF Attachments | `/ebpf-inventory` | Expected vs actually attached PacketWolf eBPF hooks, with drift flagged when a hook goes missing. |
+| Node isolation (shadow) | `/node-isolation-shadow` | A dry run of isolating a node: which pods would be evicted, which services would lose endpoints, and the blast radius. Changes nothing in the cluster. |
 | Chaos | `/chaos` | Chaos experiments (tc-netem) with safety rails. |
 | Canary | `/canary` | Canary traffic shifting for network/deploy validation. |
 | Replay | `/replay` | Replay captured traffic or incidents for validation. |

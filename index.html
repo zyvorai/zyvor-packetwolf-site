@@ -101,7 +101,7 @@
     <p class="eyebrow">What you get</p>
     <h2>A console, a CLI and an API.</h2>
     <div class="grid" style="margin-top:22px">
-      <div class="card"><h3>87 pages</h3><p>Observability, security, intelligence, operations, networking, eBPF data and system, plus 60 embeddable panels.</p></div>
+      <div class="card"><h3>90 pages</h3><p>Observability, security, intelligence, operations, networking, eBPF data and system, plus 60 embeddable panels.</p></div>
       <div class="card"><h3>15 intelligence engines</h3><p>Anomaly detection, AutoPolicy, healer, root cause, forecasting and more.</p></div>
       <div class="card"><h3>Non-Kubernetes containers</h3><p>A node agent surfaces Podman and Docker containers that cluster tools never see.</p></div>
       <div class="card"><h3>Roles and SSO</h3><p>Users and roles, with OIDC, SAML and LDAP sign-in.</p></div>
@@ -111,11 +111,13 @@
 
   <section id="new">
     <p class="eyebrow">New in this release</p>
-    <h2>Three additions.</h2>
+    <h2>Five additions.</h2>
     <div class="grid" style="margin-top:22px">
       <div class="card"><span class="tag">Operations</span><h3>BPF Attachments</h3><p>Which eBPF programs PacketWolf expects, whether each is really attached, and drift. A silent loss of a hook after a NIC or kernel change becomes visible.</p></div>
       <div class="card"><span class="tag">Observability</span><h3>Network changes</h3><p>Which link, address, route or neighbour changed on a node, and when, with findings such as default route removed and uplink down. Linux only.</p></div>
-      <div class="card"><span class="tag">Agents</span><h3>MCP server</h3><p>16 read-only tools for Claude Code, Claude Desktop and other MCP clients. Off by default, same credentials as the API, stricter about who may call it.</p></div>
+      <div class="card"><span class="tag">Observability</span><h3>Per-second metrics</h3><p>One-second rates for flows, API requests, 5xx responses and node network counters over the last 15 minutes. Sources that cannot be read say so.</p></div>
+      <div class="card"><span class="tag">Operations</span><h3>Node isolation, shadow mode</h3><p>A dry run of isolating a node: pods that would be evicted, services that would lose endpoints, blast radius. Changes nothing.</p></div>
+      <div class="card"><span class="tag">Agents</span><h3>MCP server</h3><p>18 read-only tools for Claude Code, Claude Desktop and other MCP clients. Off by default, same credentials as the API, stricter about who may call it.</p></div>
     </div>
   </section>
 

@@ -3,7 +3,7 @@
 PacketWolf exposes a [Model Context Protocol](https://modelcontextprotocol.io) server so AI agents
 (Claude Code, Claude Desktop, and other MCP clients) can query your cluster's network intelligence.
 
-**Read-only by design.** This version ships 16 tools and every one of them is a read. There is no
+**Read-only by design.** This version ships 18 tools and every one of them is a read. There is no
 tool that creates, changes, deletes, applies, or executes anything, and there is no flag that turns
 one on.
 
@@ -81,6 +81,8 @@ namespace, so they are hidden from and refused to namespace-scoped credentials.
 | `packetwolf_ebpf_drop_stats` | `limit?`, `offset?` | admin | `/api/v1/ebpf/drops` |
 | `packetwolf_compliance_frameworks` | none | cluster-wide | `/api/v1/compliance/frameworks` |
 | `packetwolf_security_posture` | none | admin | `/api/v1/security/posture` |
+| `packetwolf_metrics_seconds` | `window` (1-900 s) | viewer | `/api/v1/metrics/seconds` |
+| `packetwolf_node_isolation_shadow_runs` | `limit?` (capped at 50) | viewer | `/api/v1/nodes/isolation/shadow` |
 
 Argument bounds: `limit` 1..200 (default 50), `offset` 0..100000, `namespace` an RFC 1123 name of at
 most 253 characters, `verdict` one of FORWARDED, DROPPED, ERROR, AUDIT, REDIRECTED, TRACED,

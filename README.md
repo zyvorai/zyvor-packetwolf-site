@@ -56,7 +56,7 @@ A web console, a CLI (`netpred`), a terminal UI and a REST API in one image.
 | **eBPF data** | Conntrack table, policy map, IP cache, load-balancer map, drop analytics |
 | **System** | Settings, users and roles, SSO (OIDC, SAML, LDAP), API access |
 
-87 desktop pages and 60 embeddable panels in the current console. Full list: [docs/pages.md](docs/pages.md).
+90 desktop pages and 60 embeddable panels in the current console. Full list: [docs/pages.md](docs/pages.md).
 
 ## New in this release
 
@@ -64,7 +64,9 @@ A web console, a CLI (`netpred`), a terminal UI and a REST API in one image.
 |---|---|
 | **BPF Attachments** | Lists the eBPF programs PacketWolf expects to be attached, whether each really is, and flags drift, so a silent loss of a hook after a NIC or kernel change is visible. Read-only. |
 | **Network changes** | Records which link, address, route or neighbour changed on a node, and when, and derives findings such as *default route removed*, *uplink down* and *MTU changed*. Linux only. |
-| **MCP server** | `POST /api/mcp` exposes 16 read-only tools to AI agents (Claude Code, Claude Desktop and other MCP clients). **Off by default.** Uses the same authentication as the REST API and is stricter about who may call it. |
+| **Per-second metrics** | One-second resolution rates for flows, API requests, 5xx responses and node network counters, kept for the last 15 minutes. Unavailable sources say so; nothing is invented. |
+| **Node isolation (shadow)** | A dry run of isolating a node: which pods would be evicted, which services would lose endpoints, what the healer would do, and the blast radius. It changes nothing in the cluster. |
+| **MCP server** | `POST /api/mcp` exposes 18 read-only tools to AI agents (Claude Code, Claude Desktop and other MCP clients). **Off by default.** Uses the same authentication as the REST API and is stricter about who may call it. |
 
 ## Run it
 
