@@ -1,0 +1,153 @@
+name: Sign image
+
+# Signs an already-published image BY DIGEST (keyless, GitHub OIDC), attaches its SBOM and a SLSA provenance
+# attestation, and optionally uploads the SBOM and provenance to a release of this repository.
+# Manual only: nothing is signed until someone runs it.
+#
+#   gh workflow run sign-image.yml --repo zyvorai/zyvor-packetwolf-site --ref main \
+#     -f confirm=sign -f image_digest=sha256:<64 hex> [-f release_tag=v2026.10.26.1]
+#
+# The signer identity that users verify against is this file on main:
+#   https://github.com/zyvorai/zyvor-packetwolf-site/.github/workflows/sign-image.yml@refs/heads/main
+# so the job refuses to run from any other ref.
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "sign" to sign and attest. Anything else stops before touching the registry.'
+        required: true
+        type: string
+      image:
+        description: 'Image repository (no tag, no digest)'
+        required: true
+        default: ghcr.io/zyvorai/zyvor-packetwolf
+        type: string
+      image_digest:
+        description: 'Digest to sign, sha256:<64 hex>. Get it from the release notes or: docker buildx imagetools inspect <image>:<tag>'
+        required: true
+        type: string
+      source_commit:
+        description: 'Commit the image was built from (40 hex). Recorded in the provenance. Leave empty if unknown.'
+        required: false
+        default: ''
+        type: string
+      release_tag:
+        description: 'Release of this repository to attach the SBOM and provenance to . Empty = workflow artifact only.'
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  SIGNER_REF: refs/heads/main
+
+jobs:
+  sign:
+    name: Sign, SBOM, provenance
+    # This repository is public, so GitHub-hosted runners are free. No self-hosted runner is registered here, and none must be
+    # (a public repository must never be given one).
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: ${{ inputs.confirm == 'sign' && github.ref == 'refs/heads/main' }}
+    permissions:
+      contents: write   # attach the SBOM and provenance to a release of this repository
+      id-token: write   # the OIDC token Fulcio turns into the short-lived signing certificate
+      packages: write   # push the signature and attestations next to the image (the package must grant this repository write access)
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Validate inputs
+        env:
+          IMAGE: ${{ inputs.image }}
+          DIGEST: ${{ inputs.image_digest }}
+          COMMIT: ${{ inputs.source_commit }}
+          TAG: ${{ inputs.release_tag }}
+        run: |
+          set -euo pipefail
+          [[ "$IMAGE" =~ ^ghcr\.io/zyvorai/[a-z0-9._-]+$ ]] || { echo "image must be ghcr.io/zyvorai/<name>"; exit 1; }
+          [[ "$DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]] || { echo "image_digest must be sha256:<64 hex>"; exit 1; }
+          [[ "$COMMIT" =~ ^([0-9a-f]{40})?$ ]] || { echo "source_commit must be 40 hex or empty"; exit 1; }
+          [[ "$TAG" =~ ^(v[0-9][0-9A-Za-z._-]*)?$ ]] || { echo "release_tag must look like v2026.10.26.1 or be empty"; exit 1; }
+
+      - name: Network preflight (Sigstore and registry reachable from this runner)
+        run: |
+          set -euo pipefail
+          for u in https://fulcio.sigstore.dev/api/v2/configuration https://rekor.sigstore.dev/api/v1/log \
+                   https://tuf-repo-cdn.sigstore.dev/timestamp.json https://ghcr.io/v2/; do
+            code=$(curl -s -o /dev/null -m 15 -w '%{http_code}' "$u" || true)
+            echo "$code $u"
+            case "$code" in 2*|401) ;; *) echo "::error::cannot reach $u from this runner"; exit 1 ;; esac
+          done
+          [ -n "${ACTIONS_ID_TOKEN_REQUEST_URL:-}" ] || { echo "::error::no OIDC token endpoint (id-token: write missing?)"; exit 1; }
+
+      - uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
+        with:
+          cosign-release: v3.1.3
+
+      - uses: anchore/sbom-action/download-syft@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c # v0.24.3
+        with:
+          syft-version: v1.51.1
+
+      - name: Log in to the registry
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          # GHCR_SIGN_TOKEN (optional secret, a token with write on the package) wins when the package does not grant
+          # this repository Actions access.
+          password: ${{ secrets.GHCR_SIGN_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Sign, SBOM, provenance
+        env:
+          IMAGE: ${{ inputs.image }}
+          DIGEST: ${{ inputs.image_digest }}
+          COMMIT: ${{ inputs.source_commit }}
+        run: |
+          set -euo pipefail
+          args=(--image "$IMAGE@$DIGEST" --out attestations
+                --builder-id "$GITHUB_SERVER_URL/$GITHUB_WORKFLOW_REF"
+                --verify-identity "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/.github/workflows/sign-image.yml@$SIGNER_REF"
+                --verify-issuer https://token.actions.githubusercontent.com)
+          [ -n "$COMMIT" ] && args+=(--source-commit "$COMMIT")
+          # No source commit given: do not let the script default to this workflow's own commit (that is not the build).
+          GITHUB_SHA="${COMMIT}" .github/scripts/sign-and-attest.sh "${args[@]}"
+
+      - name: Name the assets
+        id: assets
+        env:
+          IMAGE: ${{ inputs.image }}
+          TAG: ${{ inputs.release_tag }}
+        run: |
+          set -euo pipefail
+          base="$(basename "$IMAGE")-${TAG:-$(date -u +%Y%m%d)}"
+          cp attestations/sbom.spdx.json "attestations/$base.sbom.spdx.json"
+          cp attestations/provenance.json "attestations/$base.provenance.json"
+          echo "base=$base" >> "$GITHUB_OUTPUT"
+
+      - name: Keep the assets with the run
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4
+        with:
+          name: image-attestations
+          path: |
+            attestations/*.sbom.spdx.json
+            attestations/*.provenance.json
+
+      - name: Attach to the public release
+        if: ${{ inputs.release_tag != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.release_tag }}
+          BASE: ${{ steps.assets.outputs.base }}
+        run: |
+          set -euo pipefail
+          rel=$(curl -fsS -H "Authorization: Bearer $GH_TOKEN" "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/tags/$TAG")
+          id=$(jq -r .id <<<"$rel")
+          for f in "attestations/$BASE.sbom.spdx.json" "attestations/$BASE.provenance.json"; do
+            n=$(basename "$f")
+            curl -fsS -X POST -H "Authorization: Bearer $GH_TOKEN" -H 'Content-Type: application/json' \
+              --data-binary "@$f" "https://uploads.github.com/repos/$GITHUB_REPOSITORY/releases/$id/assets?name=$n" >/dev/null
+            echo "uploaded $n to $GITHUB_REPOSITORY $TAG"
+          done
