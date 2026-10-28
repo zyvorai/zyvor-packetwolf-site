@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacketWolf by Zyvor: know which process made the call</title>
-<meta name="description" content="Kernel-native network intelligence for Kubernetes. Process-to-socket attribution, AutoPolicy for Cilium, cross-layer root cause and autonomous healing. Binary release on GitHub Container Registry.">
+<meta name="description" content="Kernel-native network intelligence for Kubernetes. Process-to-socket attribution, AutoPolicy for Cilium, cross-layer root cause and healer proposals. Binary release on GitHub Container Registry.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="PacketWolf: know which process made the call">
-<meta property="og:description" content="Kernel-native network intelligence for Kubernetes: attribution, AutoPolicy, root cause, healing.">
+<meta property="og:description" content="Kernel-native network intelligence for Kubernetes: attribution, AutoPolicy, root cause, healer proposals.">
 <meta property="og:image" content="https://zyvorai.github.io/zyvor-packetwolf-site/assets/hero-dark.jpg">
 <meta property="og:url" content="https://zyvorai.github.io/zyvor-packetwolf-site/">
 <meta name="twitter:card" content="summary_large_image">
@@ -63,13 +63,26 @@
   .note { margin-top:14px; color:var(--faint); font-size:14px; }
   footer { margin-top:72px; padding:30px 0 46px; border-top:1px solid var(--line); color:var(--faint); font-size:14px; }
   footer .wrap { display:flex; flex-wrap:wrap; gap:8px 26px; justify-content:space-between; }
+  .shot { margin:0; } .shot img { width:100%; height:auto; display:block; border-radius:14px; border:1px solid var(--line); background:var(--panel); }
+  .shot figcaption { color:var(--faint); font-size:13px; margin-top:8px; }
+  .shot.big img { border-radius:18px; box-shadow:0 24px 60px -28px rgba(0,0,0,.55); }
+  .thumbs { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:18px; margin-top:22px; }
+  .phones { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:18px; margin-top:22px; max-width:720px; }
+  .phones img { border-radius:22px; }
+  .pill { display:inline-block; font:600 11px/1 var(--mono); letter-spacing:.08em; text-transform:uppercase; color:var(--amber); border:1px solid var(--line); padding:5px 8px; border-radius:999px; margin-bottom:10px; }
+  .callout { margin-top:18px; padding:14px 18px; border:1px solid var(--line); border-left:3px solid var(--amber); border-radius:12px; background:var(--panel); color:var(--mute); font-size:15px; }
+  .callout b { color:var(--text); }
+  td.mono, td code, .card code, li code { font-family:var(--mono); font-size:.9em; }
+  ul.plain { margin:10px 0 0; padding-left:20px; color:var(--mute); font-size:15px; } ul.plain li { margin:5px 0; }
+  .two > * { min-width:0; }
+  @media (max-width:820px) { td:first-child { white-space:normal; } th,td { padding:10px 8px; } table { font-size:14px; } }
   .banner { margin:0 0 0; padding:12px 16px; border:1px solid var(--line); border-radius:12px; color:var(--mute); font-size:14px; background:var(--panel); }
 </style>
 </head>
 <body>
 <nav><div class="wrap">
   <b><i>P</i>PacketWolf</b>
-  <a class="l" href="#how">How it works</a><a class="l" href="#new">New</a><a class="l" href="#run">Run it</a><a class="l" href="#plans">Plans</a><a class="l" href="verify.html">Verify our images</a>
+  <a class="l" href="#how">How it works</a><a class="l" href="#console">Console</a><a class="l" href="#security">Security</a><a class="l" href="#new">New</a><a class="l" href="#run">Run it</a><a class="l" href="#plans">Plans</a><a class="l" href="verify.html">Verify our images</a>
   <span class="sp"></span>
   <a class="btn" href="https://zyvor.dev/schedule?utm_source=pages&utm_medium=packetwolf&utm_campaign=nav">Book a demo</a>
 </div></nav>
@@ -77,8 +90,8 @@
 <header class="hero"><div class="wrap">
   <img src="assets/hero-dark.jpg" alt="PacketWolf: know which process made the call. Fix it before it pages you." width="2400" height="1260">
   <h1>Know which process made the call.<br><em>Fix it before it pages you.</em></h1>
-  <p class="lede">Kernel-native network intelligence for Kubernetes. PacketWolf ties every connection to the process behind it, learns your traffic into Cilium policy, explains an incident across layers and heals what it can.</p>
-  <div class="cta"><a class="btn" href="#run">Run the image</a><a class="btn ghost" href="https://github.com/zyvorai/zyvor-packetwolf-site#readme">Read the README</a></div>
+  <p class="lede">Kernel-native network intelligence for Kubernetes. PacketWolf ties every connection to the process behind it, learns your traffic into Cilium policy, explains an incident across layers and proposes the fix.</p>
+  <div class="cta"><a class="btn" href="#run">Run the image</a><a class="btn ghost" href="#console">See the console</a><a class="btn ghost" href="downloads/PacketWolf-Feature-Guide.pdf">Feature guide (PDF)</a></div>
 </div></header>
 
 <main class="wrap">
@@ -87,14 +100,58 @@
   <section id="how">
     <p class="eyebrow">How it works</p>
     <h2>From a slow request to a fixed one.</h2>
-    <p class="sub">Five steps, one console. Each is a capability in the product, not a roadmap item.</p>
+    <p class="sub">Five steps, one console. The healer proposes and records fixes; it does not apply them for you.</p>
     <div class="steps">
       <div class="card"><h3>See every flow</h3><p>Hubble flows, verdicts, drops and L7 context on a live service map.</p></div>
       <div class="card"><h3>Name the process</h3><p>Kernel attribution: which process made which call, not just which pod.</p></div>
       <div class="card"><h3>Write the policy</h3><p>AutoPolicy learns real traffic and suggests Cilium rules.</p></div>
       <div class="card"><h3>One root cause</h3><p><code>netpred explain</code> joins kernel, DNS, network and Kubernetes evidence.</p></div>
-      <div class="card"><h3>Fix, then prove it</h3><p>An autonomous healer, checked with chaos and replay.</p></div>
+      <div class="card"><h3>Propose the fix</h3><p>The healer diagnoses drops and proposes a fix; you apply it. Chaos from the CLI checks it.</p></div>
     </div>
+  </section>
+
+
+  <section id="console">
+    <p class="eyebrow">The console</p>
+    <h2>Clean, fast, light or dark.</h2>
+    <p class="sub">One web console for flows, topology, policy, approvals and audit. It follows your system theme, searches every page with <code>&#8984;K</code>, and works on a phone. Pages show a dash or <i>not available</i> when data is missing, never an invented zero.</p>
+    <figure class="shot big"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/screens/servicemap-desktop-dark.jpg"><img src="assets/screens/servicemap-desktop-light.jpg" alt="PacketWolf Service Map: nine services in five namespaces, coloured by health, with traffic edges." loading="lazy" width="2160" height="1350"></picture><figcaption>Service Map. Sample data: invented namespaces and workloads.</figcaption></figure>
+    <div class="thumbs">
+      <figure class="shot"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/screens/flows-desktop-dark.jpg"><img src="assets/screens/flows-desktop-light.jpg" alt="Flow Monitor with verdict donut, top talkers and a flow table." loading="lazy" width="2160" height="1350"></picture><figcaption>Flow Monitor</figcaption></figure>
+      <figure class="shot"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/screens/approvals-desktop-dark.jpg"><img src="assets/screens/approvals-desktop-light.jpg" alt="Policy Approvals: four pending policy changes with namespace, submitter and age." loading="lazy" width="2160" height="1350"></picture><figcaption>Policy Approvals</figcaption></figure>
+      <figure class="shot"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/screens/users-desktop-dark.jpg"><img src="assets/screens/users-desktop-light.jpg" alt="User Accounts with roles and namespace scopes, including SSO accounts and a disabled account." loading="lazy" width="2160" height="1350"></picture><figcaption>User Accounts: roles and namespace scopes</figcaption></figure>
+      <figure class="shot"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/screens/audit-desktop-dark.jpg"><img src="assets/screens/audit-desktop-light.jpg" alt="Audit log with policy submit, approve and reject entries, shell sessions and session revocations." loading="lazy" width="2160" height="1350"></picture><figcaption>Audit log</figcaption></figure>
+      <figure class="shot"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/screens/palette-desktop-dark.jpg"><img src="assets/screens/palette-desktop-light.jpg" alt="Search palette listing pages that match the word policy." loading="lazy" width="2160" height="1350"></picture><figcaption>Search palette</figcaption></figure>
+      <figure class="shot"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/screens/dashboard-desktop-dark.jpg"><img src="assets/screens/dashboard-desktop-light.jpg" alt="Dashboard with flow rate, error rate, latency and top talkers." loading="lazy" width="2160" height="1350"></picture><figcaption>Dashboard</figcaption></figure>
+    </div>
+    <div class="phones">
+      <figure class="shot"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/screens/flows-phone-dark.jpg"><img src="assets/screens/flows-phone-light.jpg" alt="Flow Monitor on a phone." loading="lazy" width="780" height="1688"></picture></figure>
+      <figure class="shot"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/screens/approvals-phone-dark.jpg"><img src="assets/screens/approvals-phone-light.jpg" alt="Policy Approvals on a phone." loading="lazy" width="780" height="1688"></picture></figure>
+      <figure class="shot"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/screens/palette-phone-dark.jpg"><img src="assets/screens/palette-phone-light.jpg" alt="Search palette on a phone." loading="lazy" width="780" height="1688"></picture></figure>
+    </div>
+    <p class="note">Screenshots are taken from the current build against synthetic sample data. Light and dark follow your system setting.</p>
+  </section>
+
+  <section id="security">
+    <p class="eyebrow">Security model</p>
+    <h2>Deny by default. Decided on the server.</h2>
+    <p class="sub">Every request needs a credential, and what it may see or do is enforced by the API. The console only mirrors those decisions.</p>
+    <div class="grid">
+      <div class="card"><h3>Roles and capabilities</h3><p>Viewer and partner read. Operator simulates and applies low-impact containment. Approver approves. Security-admin holds simulate, contain, approve and break-glass. Admin can do everything.</p></div>
+      <div class="card"><h3>Namespace-scoped accounts</h3><p>Limit an account to named namespaces. A flow is visible when its source or destination is in scope; cluster-level data is refused. The namespace list wins over the role, so a scoped admin is not a platform admin.</p></div>
+      <div class="card"><h3>Approvals, two people</h3><p>One person submits a Cilium policy, another reviews the diff and approves. The policy is validated again before it is applied. Both names, the namespace and every step are recorded.</p></div>
+      <div class="card"><h3>Audit</h3><p>State changes are logged with time, actor, action, target and outcome, kept 30 days. Actions that PacketWolf only records are marked <code>recorded</code>.</p></div>
+      <div class="card"><h3>Sessions that end</h3><p>Sign-out revokes the token on the server and closes open streams. Sessions have an absolute lifetime. Role and scope changes reach tokens already issued. Failed sign-ins lock out with doubling delays.</p></div>
+      <div class="card"><h3>Hardened by default</h3><p>No default password or key. Cluster-network trust is off. Every <code>kubectl</code> call passes an argument guard, outbound webhooks refuse private addresses unless allowed, and client addresses are trusted only from proxies you list.</p></div>
+    </div>
+    <table style="margin-top:22px">
+      <tr><th>Action</th><th>Needs</th></tr>
+      <tr><td>Read flows, policies, maps</td><td>Any role, within the account's namespaces</td></tr>
+      <tr><td>Simulate, submit a policy for approval</td><td>Simulate capability (operator, security-admin, platform-admin, admin)</td></tr>
+      <tr><td>Approve or reject</td><td>Approve capability (approver, security-admin, admin) and the approval's namespace in scope</td></tr>
+      <tr><td>Apply directly, release, rollback; users and SSO settings</td><td>Unscoped admin</td></tr>
+    </table>
+    <div class="callout"><b>What is not claimed.</b> Node cordon and drain (opt-in at install) and the Tetragon views have been tested against mocks, not a live cluster. Capture, mirror, chaos and replay entries in the console are records only. Live-cluster verification of the admission webhook, WebSocket scoping and shell limits under load is still outstanding. The <a href="https://github.com/zyvorai/zyvor-packetwolf-site/blob/main/docs/security.md">security summary</a> and the <a href="downloads/PacketWolf-Feature-Guide.pdf">feature guide</a> list the details.</div>
   </section>
 
   <section>
@@ -102,22 +159,37 @@
     <h2>A console, a CLI and an API.</h2>
     <div class="grid" style="margin-top:22px">
       <div class="card"><h3>90 pages</h3><p>Observability, security, intelligence, operations, networking, eBPF data and system, plus 60 embeddable panels.</p></div>
-      <div class="card"><h3>15 intelligence engines</h3><p>Anomaly detection, AutoPolicy, healer, root cause, forecasting and more.</p></div>
+      <div class="card"><h3>15 intelligence engines</h3><p>Anomaly detection, AutoPolicy, healer proposals, root cause, forecasting and more.</p></div>
       <div class="card"><h3>Non-Kubernetes containers</h3><p>A node agent surfaces Podman and Docker containers that cluster tools never see.</p></div>
-      <div class="card"><h3>Roles and SSO</h3><p>Users and roles, with OIDC, SAML and LDAP sign-in.</p></div>
+      <div class="card"><h3>Roles, scopes and SSO</h3><p>Users, roles and namespace scopes, with OIDC, SAML and LDAP sign-in, approvals and an audit log.</p></div>
+      <div class="card"><h3>A documented API</h3><p>Every REST route is described in a generated OpenAPI spec, with the role or capability it needs.</p></div>
     </div>
     <p class="note">Every page is listed in the <a href="https://github.com/zyvorai/zyvor-packetwolf-site/blob/main/docs/pages.md">page index</a>.</p>
   </section>
 
   <section id="new">
     <p class="eyebrow">New in this release</p>
-    <h2>Five additions.</h2>
+    <h2>Five additions in 2026.10.26.1.</h2>
     <div class="grid" style="margin-top:22px">
-      <div class="card"><span class="tag">Operations</span><h3>BPF Attachments</h3><p>Which eBPF programs PacketWolf expects, whether each is really attached, and drift. A silent loss of a hook after a NIC or kernel change becomes visible.</p></div>
+      <div class="card"><span class="tag">Operations</span><h3>BPF Attachments</h3><p>Which eBPF programs PacketWolf expects, whether each is really attached, and drift. A silent loss of a hook after a NIC or kernel change becomes visible. Cilium's own programs are listed too.</p></div>
       <div class="card"><span class="tag">Observability</span><h3>Network changes</h3><p>Which link, address, route or neighbour changed on a node, and when, with findings such as default route removed and uplink down. Linux only.</p></div>
       <div class="card"><span class="tag">Observability</span><h3>Per-second metrics</h3><p>One-second rates for flows, API requests, 5xx responses and node network counters over the last 15 minutes. Sources that cannot be read say so.</p></div>
       <div class="card"><span class="tag">Operations</span><h3>Node isolation, shadow mode</h3><p>A dry run of isolating a node: pods that would be evicted, services that would lose endpoints, blast radius. Changes nothing.</p></div>
       <div class="card"><span class="tag">Agents</span><h3>MCP server</h3><p>18 read-only tools for Claude Code, Claude Desktop and other MCP clients. Off by default, same credentials as the API, stricter about who may call it.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">Next release</p>
+    <h2>Console and access refresh.</h2>
+    <p class="sub">Built and documented, not in the published image yet. The image today is 2026.10.26.1; the release notes will say which tag carries these.</p>
+    <div class="grid">
+      <div class="card"><span class="pill">Console</span><h3>Netra-style console</h3><p>Light and dark, a top bar, a search palette, a phone layout, honest numbers and error states, and tabs and filters kept in the URL.</p></div>
+      <div class="card"><span class="pill">Access</span><h3>Namespace-scoped accounts</h3><p>Server-enforced scopes, a namespace switcher, and role or scope changes that reach tokens already issued.</p></div>
+      <div class="card"><span class="pill">Policy</span><h3>Approvals with separate duties</h3><p>Simulate to submit, Approve to decide, with submitter and reviewer recorded and every step audited.</p></div>
+      <div class="card"><span class="pill">Sessions</span><h3>Server-side sign-out</h3><p>Token revocation that spans replicas with Redis, an absolute session lifetime, and a per-username lockout.</p></div>
+      <div class="card"><span class="pill">API</span><h3>Complete OpenAPI</h3><p>Every route documented with its tag, access rule and error responses, generated from the router so it cannot drift.</p></div>
+      <div class="card"><span class="pill">Install</span><h3>Safer chart defaults</h3><p>Random first-install credentials, cluster-network trust off, a bundled and pinned <code>kubectl</code>, and node maintenance as an explicit opt-in.</p></div>
     </div>
   </section>
 
@@ -141,6 +213,39 @@ http://localhost:9191</pre>
         <p>Without a Kubernetes cluster and Cilium behind it, pages that depend on cluster data show their empty states. For the full experience, <a href="https://zyvor.dev/poc?utm_source=pages&utm_medium=packetwolf&utm_campaign=run">start a 30-day PoC</a>; deployment packages come with it.</p>
         <p class="note" style="margin:0">Linux x86_64 image. An arm64 image is not published yet.</p>
       </div>
+    </div>
+  </section>
+
+  <section id="cluster">
+    <p class="eyebrow">In a cluster</p>
+    <h2>Helm, with the deployment package.</h2>
+    <div class="two">
+      <div>
+<pre><span class="c"># from the deployment package that comes with a trial or subscription</span>
+helm upgrade --install packetwolf ./chart \
+  -n packetwolf-system --create-namespace \
+  --set api.persistence.enabled=true \
+  --set api.trustedProxies=&lt;ingress pod or node CIDR&gt;
+
+<span class="c"># credentials are generated on first install and kept on upgrade</span>
+kubectl -n packetwolf-system get secret packetwolf-secret \
+  -o jsonpath='{.data.PACKETWOLF_ADMIN_PASSWORD}' | base64 -d</pre>
+      </div>
+      <div>
+        <p style="margin-top:0">Needs Kubernetes with Cilium and Hubble. The chart generates a random admin password and API key on first install, trusts no caller by default, and bundles a pinned <code>kubectl</code>. Behind an ingress, list the proxy so lockouts and rate limits see real client addresses.</p>
+        <p>The container image is published at <code>ghcr.io/zyvorai/zyvor-packetwolf</code> (Linux x86_64). The chart and the install guide ship with the deployment package: <a href="https://zyvor.dev/poc?utm_source=pages&utm_medium=packetwolf&utm_campaign=cluster">book a 30-day PoC</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="docs">
+    <p class="eyebrow">Documentation</p>
+    <h2>Read before you run.</h2>
+    <div class="grid" style="margin-top:22px">
+      <div class="card"><h3>Feature guide (PDF)</h3><p>Access, first workflows, the security model and every capability, with screenshots. <a href="downloads/PacketWolf-Feature-Guide.pdf">Download, 29 pages</a>.</p></div>
+      <div class="card"><h3>Security summary</h3><p>Roles, scopes, approvals, sessions and what is verified. <a href="https://github.com/zyvorai/zyvor-packetwolf-site/blob/main/docs/security.md">Read</a>.</p></div>
+      <div class="card"><h3>Page index</h3><p>Every console page and what it is for. <a href="https://github.com/zyvorai/zyvor-packetwolf-site/blob/main/docs/pages.md">Open</a>.</p></div>
+      <div class="card"><h3>MCP server</h3><p>18 read-only tools for AI agents, off by default. <a href="https://github.com/zyvorai/zyvor-packetwolf-site/blob/main/docs/mcp.md">Open</a>.</p></div>
     </div>
   </section>
 

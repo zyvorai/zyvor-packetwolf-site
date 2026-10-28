@@ -9,7 +9,7 @@ Every page in the PacketWolf console, grouped by area. Routes are the paths in t
 
 | Page | Route | Purpose |
 |---|---|---|
-| Network | `/embed/overview` | Primary Network overview — health, shortcuts, and mission-control cards for the PacketWolf desktop shell. |
+| Network | `/embed/overview` | Primary Network overview — health, shortcuts, and summary cards for the PacketWolf console. |
 | Cluster Health | `/clusterhealth` | Cluster health pulse for Cilium, Hubble, and PacketWolf components. |
 | Events | `/events` | Platform and network event stream. |
 | Kubernetes | `/kubernetes` | Kubernetes inventory context for network intelligence. |
@@ -42,7 +42,8 @@ Every page in the PacketWolf console, grouped by area. Routes are the paths in t
 
 | Page | Route | Purpose |
 |---|---|---|
-| Policy Approvals | `/policies` | Policy approvals queue — review and approve AutoPolicy or containment recommendations. |
+| Policies | `/policies` | The list of network policies in your cluster (Cilium and Kubernetes), with create, edit, simulate and delete for admins. |
+| Policy Approvals | `/policy-approvals` | Review the diff of a submitted network policy and approve or reject it; approving applies it. Needs the Approve capability and the approval's namespace in scope. |
 | Egress Security | `/egress-security` | Egress security posture — external destinations and least-privilege egress controls. |
 | Templates | `/templates` | Policy and response templates library. |
 | Policy Editor | `/policy-editor` | Edit Cilium/network policies as text or structured forms. |
@@ -50,7 +51,7 @@ Every page in the PacketWolf console, grouped by area. Routes are the paths in t
 | Rule Builder | `/rule-builder` | Guided rule builder for least-privilege network rules. |
 | Ingress Security | `/ingress-security` | Ingress security posture and controls. |
 | Pod Security | `/pod-security` | Pod-level network security overview. |
-| User accounts | `/user-accounts` | User accounts and access management for the PacketWolf UI/API. |
+| User accounts | `/user-accounts` | Accounts, roles and namespace scopes for the PacketWolf console and API; disable an account to end its sessions. |
 | Anomalies | `/anomalies` | Behavioral anomaly detections for unusual network patterns. |
 | Containment | `/containment` | Workload containment — simulate, apply, and roll back quarantine profiles. |
 | VM Guard | `/vm-guard` | VM Guard — PacketWolf containment and flow view for KubeVirt VMs. |
@@ -82,7 +83,7 @@ Every page in the PacketWolf console, grouped by area. Routes are the paths in t
 | Graph Explorer | `/graph-explorer` | Explore the live risk/attack/dependency graph. |
 | CRD Manager | `/crds` | PacketWolf CRD manager (FlowPolicy, AutoPolicy, Containment, and more). |
 | AutoPolicy | `/autopolicy-engine` | AutoPolicy Engine — ML-scored least-privilege CiliumNetworkPolicy from real Hubble traffic, persistent learn/suggest/enforce jobs, and one-click namespace isolation (Open/Default-Deny/Zero-Trust). |
-| Healer | `/healer` | Autonomous healer recommendations and actions for network faults. |
+| Healer | `/healer` | Network healer: proposed fixes for network faults. A fix is recorded as handled; PacketWolf does not apply it. |
 | Root Cause | `/rootcause` | Root-cause analysis correlating drops, policy, DNS, and kernel signals. |
 | Internet Test | `/internet-test` | Internet reachability / egress path testing. |
 | Troubleshoot | `/troubleshoot` | Guided network troubleshooting workflows. |
@@ -94,13 +95,13 @@ Every page in the PacketWolf console, grouped by area. Routes are the paths in t
 |---|---|---|
 | eBPF Hub | `/ebpf-hub` | eBPF hub landing page for map readers, probes, and dataplane status. |
 | eBPF Data Plane | `/ebpf-dataplane` | Honest eBPF dataplane status — which probe phases attached, failed, or remain userspace. |
-| BPF Attachments | `/ebpf-inventory` | Expected vs actually attached PacketWolf eBPF hooks, with drift flagged when a hook goes missing. |
+| BPF Attachments | `/ebpf-inventory` | Which PacketWolf and Cilium eBPF hooks should be attached, which are, and where they have drifted. |
 | Node isolation (shadow) | `/node-isolation-shadow` | A dry run of isolating a node: which pods would be evicted, which services would lose endpoints, and the blast radius. Changes nothing in the cluster. |
-| Chaos | `/chaos` | Chaos experiments (tc-netem) with safety rails. |
+| Chaos | `/chaos` | Chaos experiment log. Entries are records only; no fault is injected. |
 | Canary | `/canary` | Canary traffic shifting for network/deploy validation. |
-| Replay | `/replay` | Replay captured traffic or incidents for validation. |
-| Capture | `/capture` | Packet / flow capture sessions. |
-| Mirroring | `/mirror` | Traffic mirroring configuration. |
+| Replay | `/replay` | Replay recordings: labelled time windows with the hubble observe command that replays them. |
+| Capture | `/capture` | Packet capture session records. The API runs no capture itself. |
+| Mirroring | `/mirror` | Traffic mirror rule records. The API does not program mirroring. |
 | MultiCluster | `/multicluster` | Multi-cluster network visibility. |
 | Cluster Mesh | `/clustermesh` | Cilium Cluster Mesh topology and status. |
 | BGP Peering | `/bgp` | BGP peering status and routes. |
@@ -139,7 +140,7 @@ Every page in the PacketWolf console, grouped by area. Routes are the paths in t
 
 | Page | Route | Purpose |
 |---|---|---|
-| overview | `/embed/overview` | Primary Network overview — health, shortcuts, and mission-control cards for the PacketWolf desktop shell. |
+| overview | `/embed/overview` | Primary Network overview — health, shortcuts, and summary cards for the PacketWolf console. |
 | workloads | `/embed/workloads` | Workload-centric embed panel. |
 | service map | `/embed/service-map` | Embeddable service map. |
 | flows | `/embed/flows` | Embeddable live flows panel. |
