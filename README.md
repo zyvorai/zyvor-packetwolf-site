@@ -24,6 +24,8 @@
 
 </div>
 
+[Client overview (PDF)](docs/PacketWolf-Client-Overview.pdf)
+
 ---
 
 > **This repository publishes binaries and documentation only.** There is no product source code here. The container image is built from the product and published to GitHub Container Registry; the site and this page describe it.
