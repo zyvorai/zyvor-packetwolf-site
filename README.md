@@ -150,7 +150,7 @@ PacketWolf is proprietary software distributed in binary form under the [PacketW
 
 Priced per managed core with an annual minimum of USD 3,000 (INR 297,360 incl. GST in India); the minimum is an annual contract value and applies after discounts. Volume: 256-499 cores -10%, 500-999 -15%, 1,000 and above -20%; multi-year: 2 years -5%, 3 years -10%; discounts capped at 25% together.
 
-Prices: INR incl. 18% GST in India; US dollars excl. tax elsewhere (VAT, GST or sales tax added where applicable). Pay online by UPI, card or netbanking where a buy page exists; international cards work (charged in rupees); or request a US-dollar invoice by bank transfer. Custom pricing: contact [sales@zyvor.dev](mailto:sales@zyvor.dev).
+Prices: INR incl. 18% GST in India; US dollars excl. tax elsewhere (VAT, GST or sales tax added where applicable). Pay online by UPI, card or netbanking where a buy page exists; international cards work (charged in rupees). Orders of USD 5,000 or more and quotes are invoiced in USD through Skydo. Custom pricing: contact [sales@zyvor.dev](mailto:sales@zyvor.dev).
 
 Trial: a 30-day trial key comes with the deployment package; no data is lost when it ends. Buy / get a quote: [zyvor.dev/buy](https://zyvor.dev/buy).
 
